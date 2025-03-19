@@ -6,101 +6,122 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 18:30:33 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/18 19:15:58 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/19 12:57:14 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void	ft_init_args(t_situation *stt, int argc, char **argv)
+static int	ft_init_philo(t_philo *philo, t_sim *sim, int id, int nr_philo)
 {
-	stt->arg.philo_count = ft_atoil(argv[1]);
-	stt->arg.time_to_die = ft_atoil(argv[2]);
-	stt->arg.time_to_eat = ft_atoil(argv[3]);
-	stt->arg.time_to_sleep = ft_atoil(argv[4]);
-	if (argc == 6)
-		stt->arg.must_eat_count = ft_atoil(argv[5]);
-	else
-		stt->arg.must_eat_count = -1;
-}
-
-static int	ft_init_forks(t_situation *stt)
-{
-	int				i;
-	pthread_mutex_t	*mutexes;
-
-	mutexes = (pthread_mutex_t *)
-		malloc(sizeof(pthread_mutex_t) * stt->arg.philo_count);
-	if (!mutexes)
+	philo->sim = sim;
+	philo->id = id + 1;
+	philo->meals_eaten = 0;
+	philo->left_fork = &sim->forks[id];
+	philo->right_fork = &sim->forks[(id + 1) % nr_philo];
+	philo->odd = (philo->id % 2 == 1);
+	philo->t_last_meal = 0;
+	if (mtx_action(&philo->mtx_last_meal, INIT, sim))
 		return (0);
-	i = 0;
-	while (i < stt->arg.philo_count)
-	{
-		pthread_mutex_init(mutexes + i, NULL);
-		i++;
-	}
-	stt->forks = mutexes;
+	philo->mtx_last_meal_init = 1;
 	return (1);
 }
 
-static int	ft_init_philo(t_situation *stt, pthread_t *thds, int32_t i)
+static int	ft_init_philos(t_sim *sim)
 {
-	stt->philos[i].id = i + 1;
-	stt->philos[i].right = &stt->forks[i];
-	stt->philos[i].left = NULL;
-	stt->philos[i].th = thds[i];
-	stt->philos[i].arg = stt->arg;
-	stt->philos[i].situation = stt;
-	stt->philos[i].is_first_loop = 1;
-	stt->philos[i].last_eating_time = 0;
-	stt->philos[i].eaten = 0;
-}
+	int	i;
+	int	nr_philo;
 
-static int	ft_init_philos(t_situation *stt)
-{
-	pthread_t	*thds;
-	int32_t		i;
-
-	stt->philos = (t_philo *)malloc(sizeof(t_philo) * stt->arg.philo_count);
-	if (!stt->philos)
-		return (0);
-	thds = (pthread_t *)malloc(sizeof(pthread_t) * stt->arg.philo_count);
-	if (!thds)
-		return (free(stt->philos), 0);
-	stt->threads = thds;
-	i = 0;
-	while (i < stt->arg.philo_count)
+	nr_philo = sim->nr_philo;
+	sim->philos = (t_philo *)malloc(sizeof(t_philo) * nr_philo);
+	if (!sim->philos)
 	{
-		ft_init_philo(stt, thds, i);
-		if (stt->arg.philo_count == 1)
-			break ;
-		if (i == 0)
-			stt->philos[i].left = &stt->forks[stt->arg.philo_count - 1];
-		else
-			stt->philos[i].left = &stt->forks[i - 1];
+		ft_exiterr(ERROR_MALLOC, sim);
+		return (0);
+	}
+	i = 0;
+	while (i < nr_philo)
+	{
+		if (ft_init_philo(&sim->philos[i], sim, i, nr_philo))
+		{
+			while (i > 0)
+				(void)mtx_action(&sim->philos[--i].mtx_last_meal, DESTROY, sim);
+			free(sim->philos);
+			sim->philos = NULL;
+			return (0);
+		}
 		i++;
 	}
 	return (1);
 }
 
-int	ft_init(t_situation **stt, int argc, char **argv)
+static int	ft_init_forks(t_sim *sim)
 {
-	*stt = (t_situation *)malloc(sizeof(t_situation));
-	if (!*stt)
-		return (ft_exiterr("Error: Malloc failed\n", 1, NULL));
-	ft_init_args(*stt, argc, argv);
-	if (!ft_init_forks(*stt))
-		return (ft_exiterr("Error: Malloc failed\n", 2, *stt));
-	if (!ft_init_philos(*stt))
-		return (ft_exiterr("Error: Malloc failed\n", 3, *stt));
-	pthread_mutex_init(&(*stt)->print_mutex, NULL);
-	(*stt)->first_philo_count = (*stt)->arg.philo_count;
-	pthread_mutex_init(&(*stt)->first_philos_mutex, NULL);
-	pthread_mutex_init(&(*stt)->life_mutex, NULL);
-	pthread_mutex_init(&(*stt)->eaten_philo_mutex, NULL);
-	(*stt)->life_ended = 0;
-	(*stt)->eaten_philo_count = 0;
-	(*stt)->is_odd_philos = (*stt)->arg.philo_count % 2;
+	int	i;
+	int	nr_philo;
+
+	nr_philo = sim->nr_philo;
+	sim->forks = (t_fork *)malloc(sizeof(t_fork) * nr_philo);
+	if (!sim->forks)
+	{
+		ft_exiterr(ERROR_MALLOC, sim);
+		return (0);
+	}
+	i = 0;
+	while (i < nr_philo)
+	{
+		if (mtx_action(&sim->forks[i].fork, INIT, NULL))
+		{
+			while (i > 0)
+				mtx_action(&sim->forks[--i].fork, DESTROY, NULL);
+			free(sim->forks);
+			sim->forks = NULL;
+			return (0);
+		}
+		sim->forks[i].fork_id = i + 1;
+		i++;
+	}
+	return (1);
+}
+
+static int	ft_init_state(t_sim *sim, int argc, char **argv)
+{
+	sim->full_philos = 0;
+	sim->stop_sim = 0;
+	sim->forks = NULL;
+	sim->philos = NULL;
+	sim->mtx_print_init = 0;
+	sim->mtx_full_philos_init = 0;
+	sim->mtx_stop_sim_init = 0;
+	if (!ft_init_args(sim, argc, argv))
+		return (0);
+	sim->t_think = sim->t_die - sim->t_eat - sim->t_sleep;
+	if (mtx_action(&sim->mtx_print, INIT, NULL))
+		return (0);
+	sim->mtx_print_init = 1;
+	if (mtx_action(&sim->mtx_full_philos, INIT, NULL))
+		return (0);
+	sim->mtx_full_philos_init = 1;
+	if (mtx_action(&sim->mtx_stop_sim, INIT, NULL))
+		return (0);
+	sim->mtx_stop_sim_init = 1;
+	return (1);
+}
+
+int	ft_init_sim(t_sim **sim, int argc, char **argv)
+{
+	*sim = (t_sim *)malloc(sizeof(t_sim));
+	if (!(*sim))
+	{
+		ft_exiterr(ERROR_MALLOC, *sim);
+		return (0);
+	}
+	if (!ft_init_state(*sim, argc, argv))
+		return (0);
+	if (!ft_init_forks(*sim))
+		return (0);
+	if (!ft_init_philos(*sim))
+		return (0);
 	return (1);
 }
 
