@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args.c                                             :+:      :+:    :+:   */
+/*   check.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 13:52:51 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/19 11:58:16 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/18 18:21:57 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static int	ft_check_arg_count(int argc)
 	return (1);
 }
 
-static int	ft_check_args(int argc, char **argv)
+int	ft_check_args(int argc, char **argv)
 {
 	int	i;
 
@@ -62,20 +62,5 @@ static int	ft_check_args(int argc, char **argv)
 	}
 	if (!ft_check_arg_count(argc) || !ft_check_philo_count(argv[1]))
 		return (0);
-	return (1);
-}
-
-int	ft_init_args(t_sim *sim, int argc, char **argv)
-{
-	if (!ft_check_args(argc, argv))
-		return (0);
-	sim->nr_philo = ft_atoi(argv[1]);
-	sim->t_die = ft_atoi(argv[2]);
-	sim->t_eat = ft_atoi(argv[3]);
-	sim->t_sleep = ft_atoi(argv[4]);
-	if (argc == 6)
-		sim->max_meals = ft_atoi(argv[5]);
-	else
-		sim->max_meals = -1;
 	return (1);
 }
