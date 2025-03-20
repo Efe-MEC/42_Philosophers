@@ -19,9 +19,9 @@ static void	ft_init_args(t_sim *sim, int argc, char **argv)
 	sim->arg.time_to_eat = ft_atoi(argv[3]);
 	sim->arg.time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
-		sim->arg.must_eat_count = ft_atoi(argv[5]);
+		sim->arg.req_eat_count = ft_atoi(argv[5]);
 	else
-		sim->arg.must_eat_count = -1;
+		sim->arg.req_eat_count = -1;
 }
 
 static int	ft_init_forks(t_sim *sim)

@@ -51,7 +51,7 @@ typedef struct s_arg
 	int	time_to_die;
 	int	time_to_eat;
 	int	time_to_sleep;
-	int	must_eat_count;
+	int	req_eat_count;
 }				t_arg;
 
 typedef struct s_sim
