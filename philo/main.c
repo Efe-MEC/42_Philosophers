@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 13:38:28 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/19 21:16:10 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/22 13:49:18 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static void	*ft_loop(void *arg)
 			}
 			philo->is_first_loop = 0;
 		}
-		if (ft_is_finish_first_loop(philo))
+		if (ft_is_finish_first(philo))
 			if (ft_eat(philo))
 				return (NULL);
 	}
@@ -66,7 +66,7 @@ static void	ft_start(t_sim **sim)
 	int	i;
 
 	i = 0;
-	(*sim)->start_time = ft_get_time();
+	(*sim)->start_time = ft_get_time(sim);
 	while (i < (*sim)->arg.philo_count)
 	{
 		pthread_create(&(*sim)->philos[i].th, NULL,
@@ -80,7 +80,7 @@ static void	ft_start(t_sim **sim)
 		{
 			if (ft_monitor(&(*sim)->philos[i]) != 1)
 			{
-				ft_free(*sim);
+				ft_exit(sim);
 				return ;
 			}
 			i++;

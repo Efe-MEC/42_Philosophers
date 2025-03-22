@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 21:13:59 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/20 21:13:59 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/22 13:56:45 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static void	ft_life_eating(t_philo *philo)
 
 bool	ft_eat(t_philo *philo)
 {
-	if (philo->right == NULL, philo->left == NULL)
+	if (philo->right == NULL || philo->left == NULL)
 		return (true);
 	if (philo->eaten == philo->arg.req_eat_count)
 		return (true);

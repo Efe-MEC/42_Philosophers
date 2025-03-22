@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mehcakir <mehcakir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 11:29:25 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/20 12:44:34 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/22 13:54:57 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	ft_atoi(const char *str)
 	return (sign * nb);
 }
 
-int	ft_get_time(t_sim **sim)
+uint64_t	ft_get_time(t_sim **sim)
 {
 	int	time;
 
@@ -49,9 +49,14 @@ int	ft_get_time(t_sim **sim)
 
 void	ft_usleep(t_sim **sim, uint64_t time)
 {
-	uint64_t	last;
+	uint64_t		last;
+	struct timespec	req;
 
 	last = ft_get_time(sim) + time;
 	while (ft_get_time(sim) < last)
-		usleep(100);
+	{
+		req.tv_sec = 0;
+		req.tv_nsec = 100000;
+		nanosleep(&req, NULL);
+	}
 }

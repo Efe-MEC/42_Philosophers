@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 18:30:33 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/20 01:11:50 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/22 14:30:13 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int	ft_init_forks(t_sim *sim)
 	return (1);
 }
 
-static int	ft_init_philo(t_sim *sim, pthread_t *thds, int32_t i)
+static void	ft_init_philo(t_sim *sim, pthread_t *thds, int32_t i)
 {
 	sim->philos[i].id = i + 1;
 	sim->philos[i].right = &sim->forks[i];
@@ -90,9 +90,9 @@ int	ft_init(t_sim **sim, int argc, char **argv)
 		return (ft_exiterr("Error: Malloc failed\n", 1, NULL));
 	ft_init_args(*sim, argc, argv);
 	if (!ft_init_forks(*sim))
-		return (ft_exiterr("Error: Malloc failed\n", 2, *sim));
+		return (ft_exiterr("Error: Malloc failed\n", 2, sim));
 	if (!ft_init_philos(*sim))
-		return (ft_exiterr("Error: Malloc failed\n", 3, *sim));
+		return (ft_exiterr("Error: Malloc failed\n", 3, sim));
 	pthread_mutex_init(&(*sim)->print_mutex, NULL);
 	(*sim)->first_philo_count = (*sim)->arg.philo_count;
 	pthread_mutex_init(&(*sim)->first_philos_mutex, NULL);
@@ -103,4 +103,3 @@ int	ft_init(t_sim **sim, int argc, char **argv)
 	(*sim)->is_odd_philos = (*sim)->arg.philo_count % 2;
 	return (1);
 }
-

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   think.c                                            :+:      :+:    :+:   */
+/*   loop.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 21:39:49 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/20 21:39:49 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/22 13:35:32 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	ft_minus_first_philo(t_philo *philo)
 	pthread_mutex_unlock(&philo->sim->first_philos_mutex);
 }
 
-bool ft_is_finish_first(t_philo *philo)
+bool	ft_is_finish_first(t_philo *philo)
 {
 	bool	ret;
 
