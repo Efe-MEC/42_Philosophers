@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 19:20:26 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/22 13:55:43 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/23 17:52:48 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ bool	ft_print_status(t_philo *philo, t_status status)
 	bool	ret;
 
 	ret = false;
+	if (!philo || !philo->sim)
+        return (false);
 	pthread_mutex_lock(&philo->sim->print_mutex);
 	printf("%lu %d %s\n", ft_get_time(&philo->sim), philo->id,
 		ft_get_status(status));
