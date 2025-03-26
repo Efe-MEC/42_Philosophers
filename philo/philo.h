@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 13:38:47 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/26 20:57:44 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/26 23:22:13 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <stdlib.h>
+# include <limits.h>
 # include <stdio.h>
 # include <sys/time.h>
 

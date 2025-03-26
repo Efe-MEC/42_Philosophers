@@ -6,7 +6,7 @@
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 13:52:51 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/22 21:42:42 by mehcakir         ###   ########.fr       */
+/*   Updated: 2025/03/26 23:07:39 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,12 @@ static int	ft_check_args(int argc, char **argv)
 	{
 		if (!ft_is_digit(argv[i]))
 		{
-			printf("Error: Argument is not a number\n");
+			printf("Error: Argument is not a valid number\n");
+			return (0);
+		}
+		if (ft_atoi(argv[i]) == -1)
+		{
+			printf("Error: Argument is overflowed\n");
 			return (0);
 		}
 		i++;
