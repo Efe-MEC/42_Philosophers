@@ -5,41 +5,59 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mehcakir <mehcakir@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/20 19:20:26 by mehcakir          #+#    #+#             */
-/*   Updated: 2025/03/23 17:52:48 by mehcakir         ###   ########.fr       */
+/*   Created: 2025/03/22 18:26:58 by mehcakir          #+#    #+#             */
+/*   Updated: 2025/03/22 18:46:44 by mehcakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-char	*ft_get_status(t_status status)
+static int	ft_print_status(t_ull time, t_philo *philo, t_action action)
 {
-	if (status == EATING)
-		return ("is eating");
-	else if (status == SLEEPING)
-		return ("is sleeping");
-	else if (status == THINKING)
-		return ("is thinking");
-	else if (status == DIED)
-		return ("died");
-	else if (status == TAKING_FORK)
-		return ("has taken a fork");
-	else
-		return (NULL);
+	if (action == FORK_L)
+		(void)printf("%llu %d %s\n", time, philo->id, "has taken a fork");
+	else if (action == FORK_R)
+		(void)printf("%llu %d %s\n", time, philo->id, "has taken a fork");
+	else if (action == EAT)
+		(void)printf("%llu %d %s\n", time, philo->id, "is eating");
+	else if (action == SLEEP)
+		(void)printf("%llu %d %s\n", time, philo->id, "is sleeping");
+	else if (action == THINK)
+		(void)printf("%llu %d %s\n", time, philo->id, "is thinking");
+	else if (action == DIE)
+		(void)printf("%llu %d %s\n", time, philo->id, "died");
+	else if (action == STUFFED)
+		(void)printf("%llu %d %s\n", time, philo->id, "is full");
+	return (1);
 }
 
-bool	ft_print_status(t_philo *philo, t_status status)
+int	ft_print_actions(t_ull time, t_philo *philo, t_action action, int upt_time)
 {
-	bool	ret;
+	if (!ft_mtx_actions(&philo->sim->mtx_stop_sim, LOCK, philo->sim))
+		return (0);
+	if (philo->sim->stop_sim && action != DIE)
+	{
+		if (!ft_mtx_actions(&philo->sim->mtx_stop_sim, UNLOCK, philo->sim))
+			return (0);
+		return (1);
+	}
+	if (!ft_mtx_actions(&philo->sim->mtx_stop_sim, UNLOCK, philo->sim))
+		return (0);
+	if (!ft_mtx_actions(&philo->sim->mtx_print, LOCK, philo->sim))
+		return (0);
+	if (upt_time)
+		time = ft_get_time() - philo->sim->t_start_sim;
+	ft_print_status(time, philo, action);
+	if (!ft_mtx_actions(&philo->sim->mtx_print, UNLOCK, philo->sim))
+		return (0);
+	return (1);
+}
 
-	ret = false;
-	if (!philo || !philo->sim)
-        return (false);
-	pthread_mutex_lock(&philo->sim->print_mutex);
-	printf("%lu %d %s\n", ft_get_time(&philo->sim), philo->id,
-		ft_get_status(status));
-	if (philo->eaten == philo->arg.req_eat_count)
-		ret = true;
-	pthread_mutex_unlock(&philo->sim->print_mutex);
-	return (ret);
+void	ft_exiterr(char *msg, t_sim *sim)
+{
+	if (sim && sim->mtx_print_init)
+		(void)ft_mtx_actions(&sim->mtx_print, LOCK, NULL);
+	printf("%s", msg);
+	if (sim && sim->mtx_print_init)
+		(void)ft_mtx_actions(&sim->mtx_print, UNLOCK, NULL);
 }
